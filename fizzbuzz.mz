@@ -1,11 +1,11 @@
 i = 0
 
 for(i = 0; i < 100; i = i + 1) {
-  if(i == 15) {
+  if(i % 15 == 0) {
     puts("fizzbuzz")
-  } elif(i == 3) {
+  } elif(i % 3 == 0) {
     puts("fizz")
-  } elif(i == 5) {
+  } elif(i % 5 == 0) {
     puts("buzz")
   } else {
     puts(i)
