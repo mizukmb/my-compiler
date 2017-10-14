@@ -4,42 +4,56 @@ class MyLexer
   def initialize(str)
     @str = str
     @index = 0
-    @ret = []
   end
 
   def run
-    @str.each_char do |char|
-      break if char == "\n"
+    ret = []
 
+    while @str.size > @index
       if char =~ space_or_line
         next_word!
         next
       end
 
-      # 数値リテラルチェック
-      break unless @ret.empty?
-      @str[@index..-1].each_char do |c|
-        if c =~ number_pattern
-          @ret.push c
+      word = ''
+
+      while @str.size > @index
+        unless char =~ space_or_line
+          word = char
           next_word!
-        elsif c =~ space_or_line
-          break
         else
-          raise MyLexerError
+          break
         end
+      end
+
+      ret.push case word
+      when number_pattern
+        ['lit', word]
+      when operator_pattern
+        ['operator', word]
+      else raise MyLexerError
       end
     end
 
-    ["lit", @ret.join('')]
+    ret
   end
 
+
   private
+  def char
+    @str[@index]
+  end
+
   def next_word!
     @index += 1
   end
 
   def number_pattern
-    %r(\d)
+    %r(\d+)
+  end
+
+  def operator_pattern
+    %r([+-\\*/%])
   end
 
   # 半角・全角スペース、タブ、改行
@@ -48,14 +62,5 @@ class MyLexer
   end
 end
 
-str = %w(
-0
-100
-  100
-50   
-hoge
-)
-
-str.each do |s|
-  p MyLexer.new(s).run
-end
+str = '1 + 2'
+p MyLexer.new(str).run
