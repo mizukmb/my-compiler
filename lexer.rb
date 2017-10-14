@@ -1,3 +1,5 @@
+require 'yaml'
+
 class MyLexer
   class MyLexerError < StandardError; end
 
@@ -19,7 +21,7 @@ class MyLexer
 
       while @str.size > @index
         unless char =~ space_or_line
-          word = char
+          word += char
           next_word!
         else
           break
@@ -27,6 +29,8 @@ class MyLexer
       end
 
       ret.push case word
+      when reserved_words
+        ['reserved_word', word]
       when number_pattern
         ['lit', word]
       when operator_pattern
@@ -48,6 +52,12 @@ class MyLexer
     @index += 1
   end
 
+  def reserved_words
+    rws = YAML.load_file(File.expand_path('../config/reserved_words.yml', __FILE__))
+
+    Regexp.new(rws.join('|'))
+  end
+
   def number_pattern
     %r(\d+)
   end
@@ -62,5 +72,5 @@ class MyLexer
   end
 end
 
-str = '1 + 2'
+str = 'if 1 + 2'
 p MyLexer.new(str).run
