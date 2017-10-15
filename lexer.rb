@@ -71,6 +71,3 @@ class MyLexer
     %r( |　|\t|\n)
   end
 end
-
-str = 'if 1 + 2'
-p MyLexer.new(str).run
