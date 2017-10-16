@@ -17,25 +17,30 @@ class MyLexer
         next
       end
 
-      word = ''
-
       while @str.size > @index
-        unless char =~ space_or_line
-          word += char
+        ret.push case char
+        when number_pattern
+          w = char
           next_word!
-        else
-          break
+          while char =~ number_pattern
+            w += char
+            next_word!
+          end
+          ['lit', w.to_i]
+        when operator_pattern
+          w = char
+          next_word!
+          while char =~ operator_pattern
+            w += char
+            next_word!
+          end
+          [operator_name(w), w]
+        else raise MyLexerError
         end
-      end
 
-      ret.push case word
-      when reserved_words
-        ['reserved_word', word]
-      when number_pattern
-        ['lit', word.to_i]
-      when operator_pattern
-        [operator_name(word), word]
-      else raise MyLexerError
+        while char =~ space_or_line
+          next_word!
+        end
       end
     end
 
@@ -63,7 +68,7 @@ class MyLexer
   end
 
   def operator_pattern
-    %r([+-\\*/%])
+    %r(\+|-|\*|\/|%)
   end
 
   # 半角・全角スペース、タブ、改行
