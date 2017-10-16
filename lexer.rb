@@ -32,7 +32,7 @@ class MyLexer
       when reserved_words
         ['reserved_word', word]
       when number_pattern
-        ['lit', word]
+        ['lit', word.to_i]
       when operator_pattern
         [operator_name(word), word]
       else raise MyLexerError
