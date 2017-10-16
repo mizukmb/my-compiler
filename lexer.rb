@@ -34,7 +34,7 @@ class MyLexer
       when number_pattern
         ['lit', word]
       when operator_pattern
-        ['operator', word]
+        [operator_name(word), word]
       else raise MyLexerError
       end
     end
@@ -69,5 +69,21 @@ class MyLexer
   # 半角・全角スペース、タブ、改行
   def space_or_line
     %r( |　|\t|\n)
+  end
+
+  def operator_name(word)
+    'operator_' + case word
+    when '+'
+      'plus'
+    when '-'
+      'minus'
+    when '*'
+      'multi'
+    when '/'
+      'divide'
+    when '%'
+      'surplus'
+    else nil
+    end
   end
 end

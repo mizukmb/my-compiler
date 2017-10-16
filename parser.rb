@@ -29,7 +29,7 @@ class MyParser
     ret = term
 
     while !get_next_token.nil? and
-          get_next_token[1] =~ plus_or_minus
+          get_next_token.first =~ plus_or_minus
       next_token!
       ret = [token[1], ret]
       next_token!
@@ -43,7 +43,7 @@ class MyParser
     ret = factor
 
     while !get_next_token.nil? and
-          get_next_token[1] =~ multi_or_divide
+          get_next_token.first =~ multi_or_divide
       next_token!
       ret = [token[1], ret]
       next_token!
@@ -54,27 +54,27 @@ class MyParser
   end
 
   def factor
-    if token[1] =~ number
+    if token.first == number_literal
       token
     elsif !get_next_token.nil? and (
-          get_next_token[1] =~ plus_or_minus or
-          get_next_token[1] =~ multi_or_divide )
+          get_next_token.first =~ plus_or_minus or
+          get_next_token.first =~ multi_or_divide )
       expr
     else
       raise MyParserError
     end
   end
 
-  def number
-    %r(\d+)
+  def number_literal
+    'lit'
   end
 
   def plus_or_minus
-    %r([+-])
+    %r(operator_plus|operator_minus)
   end
 
   def multi_or_divide
-    %r([\*/%])
+    %r(operator_multi|operator_divide|operator_surplus)
   end
 end
 
