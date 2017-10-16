@@ -1,5 +1,3 @@
-require './lexer.rb'
-
 class MyParser
   class MyParserError < StandardError; end
 
@@ -77,8 +75,3 @@ class MyParser
     %r(operator_multi|operator_divide|operator_surplus)
   end
 end
-
-str = gets.chomp
-a = MyLexer.new(str).run
-
-p MyParser.new(a).run
