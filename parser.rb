@@ -47,7 +47,7 @@ class MyParser
       next_token!
       ret = [token[1], ret]
       next_token!
-      ret.push term
+      ret.push factor
     end
 
     ret
