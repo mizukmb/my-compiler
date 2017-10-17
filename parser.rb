@@ -7,7 +7,7 @@ class MyParser
   end
 
   def run
-    expr
+    vocab
   end
 
   private
@@ -23,6 +23,22 @@ class MyParser
     @index += 1
   end
 
+  # 比較演算子
+  def vocab
+    ret = expr
+
+    while !get_next_token.nil? and
+          get_next_token.first =~ comparison
+      next_token!
+      ret = [token[1], ret]
+      next_token!
+      ret.push expr
+    end
+
+    ret
+  end
+
+  # 加算、減算演算子
   def expr
     ret = term
 
@@ -37,6 +53,7 @@ class MyParser
     ret
   end
 
+  # 乗算、割算、剰余演算子
   def term
     ret = factor
 
@@ -51,13 +68,15 @@ class MyParser
     ret
   end
 
+  # 数値リテラル
   def factor
     if token.first == number_literal
       token
     elsif !get_next_token.nil? and (
           get_next_token.first =~ plus_or_minus or
-          get_next_token.first =~ multi_or_divide )
-      expr
+          get_next_token.first =~ multi_or_divide or
+          get_next_token.first =~ comparison )
+      vocab
     else
       raise MyParserError
     end
@@ -73,5 +92,9 @@ class MyParser
 
   def multi_or_divide
     %r(operator_multi|operator_divide|operator_surplus)
+  end
+
+  def comparison
+    %r(operator_gt|operator_ge|operator_eq|operator_le|operator_lt|operator_ne)
   end
 end

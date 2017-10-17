@@ -68,7 +68,7 @@ class MyLexer
   end
 
   def operator_pattern
-    %r(\+|-|\*|\/|%)
+    %r(\+|-|\*|\/|%|>|>=|==|<|<=|!=)
   end
 
   # 半角・全角スペース、タブ、改行
@@ -88,6 +88,18 @@ class MyLexer
       'divide'
     when '%'
       'surplus'
+    when '>'
+      'gt'
+    when '>='
+      'ge'
+    when '=='
+      'eq'
+    when '<'
+      'lt'
+    when '<='
+      'le'
+    when '!='
+      'ne'
     else nil
     end
   end
