@@ -12,33 +12,38 @@ class MyLexer
     ret = []
 
     while @str.size > @index
-      if char =~ space_or_line
+
+      if char =~ space_or_indent
         next_word!
         next
       end
 
       while @str.size > @index
         ret.push case char
-        when number_pattern
-          w = char
-          next_word!
-          while char =~ number_pattern
-            w += char
-            next_word!
-          end
-          ['lit', w.to_i]
-        when operator_pattern
-          w = char
-          next_word!
-          while char =~ operator_pattern
-            w += char
-            next_word!
-          end
-          [operator_name(w), w]
-        else raise MyLexerError
-        end
+                 when number_pattern
+                   w = char
+                   next_word!
+                   while char =~ number_pattern
+                     w += char
+                     next_word!
+                   end
+                   ['lit', w.to_i]
+                 when operator_pattern
+                   w = char
+                   next_word!
+                   while char =~ operator_pattern
+                     w += char
+                     next_word!
+                   end
+                   [operator_name(w), w]
+                 when newline
+                   next_word!
 
-        while char =~ space_or_line
+                   ['newline', '\n']
+                 else raise MyLexerError
+                 end
+
+        while char =~ space_or_indent
           next_word!
         end
       end
@@ -71,9 +76,13 @@ class MyLexer
     %r(\+|-|\*|\/|%|>|>=|==|<|<=|!=)
   end
 
-  # 半角・全角スペース、タブ、改行
-  def space_or_line
-    %r( |　|\t|\n)
+  # 半角・全角スペース、タブ
+  def space_or_indent
+    %r( |　|\t)
+  end
+
+  def newline
+    %r(\n)
   end
 
   def operator_name(word)

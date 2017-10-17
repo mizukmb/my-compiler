@@ -7,20 +7,37 @@ class MyParser
   end
 
   def run
-    vocab
+    statement
   end
 
   private
-  def token
-    @tokenized_list[@index]
-  end
 
-  def get_next_token
-    @tokenized_list[@index + 1]
-  end
+  # 複文
+  def statement
+    ret = []
+    tmp = vocab
 
-  def next_token!
-    @index += 1
+    if !get_next_token.nil? and
+        get_next_token.first == newline
+      next_token!
+
+      ret.push tmp
+
+      until get_next_token.nil?
+        if get_next_token.first == number_literal
+
+          next_token!
+          ret.push vocab
+        end
+
+        next_token!
+      end
+      ret.unshift 'stmts'
+    else
+      ret = tmp
+    end
+
+    ret
   end
 
   # 比較演算子
@@ -72,18 +89,33 @@ class MyParser
   def factor
     if token.first == number_literal
       token
-    elsif !get_next_token.nil? and (
-          get_next_token.first =~ plus_or_minus or
-          get_next_token.first =~ multi_or_divide or
-          get_next_token.first =~ comparison )
-      vocab
+    elsif !get_next_token.nil? and
+          get_next_token.first == newline
+      token
     else
       raise MyParserError
     end
   end
 
+  def token
+    @tokenized_list[@index]
+  end
+
+  def get_next_token
+    @tokenized_list[@index + 1]
+  end
+
+  def next_token!
+    @index += 1
+  end
+
+
   def number_literal
     'lit'
+  end
+
+  def newline
+    'newline'
   end
 
   def plus_or_minus
