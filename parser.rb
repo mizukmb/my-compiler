@@ -14,33 +14,75 @@ class MyParser
 
   # 複文
   def statement
-    ret = []
-    tmp = vocab
+    ret = func
+    tmp = []
 
-    if !get_next_token.nil? and
-        get_next_token.first == newline
+    while !get_next_token.nil? and
+          get_next_token.first == newline
       next_token!
 
-      ret.push tmp
-
-      until get_next_token.nil?
-        if get_next_token.first == number_literal
-
-          next_token!
-          ret.push vocab
-        end
-
+      if !get_next_token.nil? and (
+         get_next_token.first == number_literal or
+         get_next_token.first == statement_if )
         next_token!
+
+        tmp.push func
+
+      else
+        break
       end
-      ret.unshift 'stmts'
-    else
-      ret = tmp
     end
+
+    ret = tmp.unshift('stmts', ret) if !tmp.empty?
 
     ret
   end
 
-  # 比較演算子
+  # if文
+  def func
+    ret = []
+
+    if token.first == statement_if
+      ret.push 'if'
+
+      if !get_next_token.nil? and
+          get_next_token.first == left_parenthesis
+        next_token!
+        next_token!
+
+        t = vocab
+
+        ret.push t if !get_next_token.nil? and
+                      get_next_token.first == right_parenthesis
+        next_token!
+
+        while get_next_token.first == newline
+          next_token!
+        end
+
+        if !get_next_token.nil? and
+            get_next_token.first == left_curly_brace
+          next_token!
+
+          while get_next_token.first == newline
+            next_token!
+          end
+
+          next_token!
+
+          t = statement
+
+          ret.push t if !get_next_token.nil? and
+                        get_next_token.first == right_curly_brace
+        end
+      end
+    else
+      ret = vocab
+    end
+
+    ret
+  end
+# 比較演算子
   def vocab
     ret = expr
 
@@ -128,5 +170,25 @@ class MyParser
 
   def comparison
     %r(operator_gt|operator_ge|operator_eq|operator_le|operator_lt|operator_ne)
+  end
+
+  def statement_if
+    'reserved_statement_if'
+  end
+
+  def left_parenthesis
+    'symbol_left_parenthesis'
+  end
+
+  def right_parenthesis
+    'symbol_right_parenthesis'
+  end
+
+  def left_curly_brace
+    'symbol_left_curly_brace'
+  end
+
+  def right_curly_brace
+    'symbol_right_curly_brace'
   end
 end

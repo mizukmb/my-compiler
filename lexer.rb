@@ -28,6 +28,24 @@ class MyLexer
                      next_word!
                    end
                    ['lit', w.to_i]
+                 when word_pattern
+                   w = char
+                   next_word!
+                   while char =~ word_pattern
+                     w += char
+                     next_word!
+                   end 
+
+                   if reserved_words =~ w
+                     ["reserved_statement_#{w}", w]
+                   else
+                     raise MyLexerError
+                   end
+                 when symbol_pattern
+                   w = char
+                   next_word!
+
+                   [symbol_name(w), w]
                  when operator_pattern
                    w = char
                    next_word!
@@ -40,7 +58,8 @@ class MyLexer
                    next_word!
 
                    ['newline', '\n']
-                 else raise MyLexerError
+                 else
+                   raise MyLexerError
                  end
 
         while char =~ space_or_indent
@@ -73,7 +92,15 @@ class MyLexer
   end
 
   def operator_pattern
-    %r(\+|-|\*|\/|%|>|>=|==|<|<=|!=)
+    %r(\+|-|\*|\/|%|>|>|=|<|<|!)
+  end
+
+  def word_pattern
+    %r(\A[a-z]+\Z)
+  end
+
+  def symbol_pattern
+    %r(\(|\)|\{|\})
   end
 
   # 半角・全角スペース、タブ
@@ -84,6 +111,7 @@ class MyLexer
   def newline
     %r(\n)
   end
+
 
   def operator_name(word)
     'operator_' + case word
@@ -109,7 +137,21 @@ class MyLexer
       'le'
     when '!='
       'ne'
-    else nil
+    else
+      nil
+    end
+  end
+
+  def symbol_name(word)
+    'symbol_' + case word
+    when '('
+      'left_parenthesis'
+    when ')'
+      'right_parenthesis'
+    when '{'
+      'left_curly_brace'
+    when '}'
+      'right_curly_brace'
     end
   end
 end
