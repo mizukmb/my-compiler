@@ -4,6 +4,7 @@ require 'minruby'
 require 'pp'
 
 p str = 'if(1 ==2){
+"hoge"
 50 + 60
 70 + 80
 90 + 100

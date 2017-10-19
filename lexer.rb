@@ -28,6 +28,18 @@ class MyLexer
                      next_word!
                    end
                    ['lit', w.to_i]
+                 when string_pattern
+                   next_word!
+                   w = ''
+
+                   until char =~ string_pattern
+                     w += char
+                     next_word!
+                   end
+
+                   next_word!
+
+                   ['lit', w]
                  when word_pattern
                    w = char
                    next_word!
@@ -89,6 +101,10 @@ class MyLexer
 
   def number_pattern
     %r(\d+)
+  end
+
+  def string_pattern
+    %r('|")
   end
 
   def operator_pattern
